@@ -29,9 +29,23 @@ exports.readListOfUrls = function(callback) {
 };
 
 exports.isUrlInList = function(url, callback) {
+  fs.readFile(exports.paths.list, function(err, data) {
+    var result = false;
+    var lines = data.toString().split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      if (url === lines[i]) {
+        result = true;
+      }
+    }
+    callback(result);
+  });
 };
 
 exports.addUrlToList = function(url, callback) {
+  fs.appendFile(exports.paths.list, url + '\n', function(err) {
+    console.log(err);
+  });
+  callback();
 };
 
 exports.isUrlArchived = function(url, callback) {

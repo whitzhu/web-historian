@@ -5,20 +5,22 @@ var archive = require('../helpers/archive-helpers');
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
-  var results = [];
   if ( req.method === 'POST') {
     var body = '';
     req.on('data', function(chunk) {
       body += chunk;
     });
     req.on('end', function() {
-      fs.appendFile(archive.paths.list + '\n', body, function(err) {
-        console.log(err);
+      var callback = function() {};
+      var url = JSON.parse(body);
+      var result = archive.isUrlInList(url, function(result) {
+        return result;
       });
-      console.log('body', body);
-      // results.push(JSON.parse(body));
+      if (result === false) {
+        archive.addUrlToList(url, callback);
+      }
+
     });
-    // console.log('results', results);
   }
 
   res.writeHead(200, {'Content-Type': 'text/html'});

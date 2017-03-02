@@ -8,7 +8,6 @@
 
       var app = {
         server: 'http://127.0.0.1:8080/',
-        input: $('#url :input').val(),
         send: function(message) {
           $.ajax({
             url: app.server,
@@ -16,7 +15,7 @@
             data: JSON.stringify(message),
             contentType: 'application/json',
             success: function(data) {
-              console.log('sending data success!!', data);
+              console.log('sending data success!!', message);
             },
             error: function(data) {
               console.log('error', data);
@@ -24,15 +23,20 @@
           });
         }
       };
-      $('#urlForm').on('submit', app.send.bind(this, app.input));
+      $('#urlForm').on('submit', function(event) {
+        var text = $('#url').val();
+        console.log('txt', text);
+        event.preventDefault();
+        app.send(text);
+      });
     });
-
 </script>
 </head>
 <body>
   Enter a URL here:
   <form id="urlForm">
     <input id="url" type="input" name="url"></input>
+    <input type="submit" value="Submit"></input>
   </form>
 </body>
 
