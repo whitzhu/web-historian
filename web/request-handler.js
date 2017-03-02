@@ -1,11 +1,35 @@
 var path = require('path');
 var fs = require('fs');
 var archive = require('../helpers/archive-helpers');
+var urlParse = require('url');
 
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
+
+  var requestURL = req.url;
+  var requestURLPathname = urlParse.parse(requestURL).pathname;
+
   var statusCode = 200;
+  var func = function(result, url, callback) {    
+    if (result === false) {
+      console.log("yay!!!! >_<");
+      archive.addUrlToList(url, callback);
+    }
+    if (result === true && archive.isURLArchived(url, function(result) { return result; }) === false) {  
+      console.log("nooooooooooo!!!! >_<");
+      res.writeHead(statusCode, {'Content-Type': 'text/html'});
+      fs.readFile(__dirname + '/public/loading.html', function(err, data) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('we are loading a loading page');
+          res.end(data);      
+        }
+      });
+    }
+  }; 
+
   if ( req.method === 'POST') {
     var body = '';
     req.on('data', function(chunk) {
@@ -14,32 +38,32 @@ exports.handleRequest = function (req, res) {
     req.on('end', function() {
       var callback = function() {};
       var url = JSON.parse(body);
-      var result = archive.isUrlInList(url, function(result) {
-        return result;
+      console.log("url!!!!!!!!!", url);
+      archive.isUrlInList(url, function(exists) {
+        // if (exists === false) {
+
+        func(exists, url, callback);
+        // } 
+        return exists;
       });
         //result is true & isURLArchived to false
           //return loading html file
 
-      if (result === true && archive.isURLArchived(url, function(result) { return result; }) === false || result === false) {
-        if (result === false) {
-          archive.addUrlToList(url, callback);
-        }
-        res.writeHead(statusCode, {'Content-Type': 'text/html'});
-        fs.readFile(__dirname + '/public/loading.html', function(err, data) {
-          if (err) {
-            console.log(err);
-          } else {
-            res.end(data);      
-          }
-        });
-      } 
+     
     });
-
   }
 
-  if (req.method === 'GET') {
+
+  //update to check if pathname exisits in archivedSites 
+    //if exist server the site
+    //if it doesn't exist server loading? 
+  if (req.method === 'GET' && requestURLPathname !== '/') {
     statusCode = 404;
   }
+  
+  console.log('the current statusCode is ', statusCode);
+
+  res.writeHead(statusCode, {'Content-Type': 'text/html'});  
   res.writeHead(statusCode, {'Content-Type': 'text/html'});  
   fs.readFile(__dirname + '/public/index.html', function(err, data) {
     if (err) {

@@ -15,7 +15,11 @@
             data: JSON.stringify(message),
             contentType: 'application/json',
             success: function(data) {
-              console.log('sending data success!!', message);
+              console.log('sending data success!!', data);
+
+              //load HTML data into dom 
+              $('body').load(data);
+
             },
             error: function(data) {
               console.log('error', data);
@@ -32,7 +36,7 @@
     });
 </script>
 </head>
-<body>
+<body id='body'>
   Enter a URL here:
   <form id="urlForm">
     <input id="url" type="input" name="url"></input>
