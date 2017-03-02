@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <link rel="stylesheet" type="text/css" href="styles.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+
+      var app = {
+        server: 'http://127.0.0.1:8080/',
+        input: $('#url :input').val(),
+        send: function(message) {
+          $.ajax({
+            url: app.server,
+            type: 'POST',
+            data: JSON.stringify(message),
+            contentType: 'application/json',
+            success: function(data) {
+              console.log('sending data success!!', data);
+            },
+            error: function(data) {
+              console.log('error', data);
+            }
+          });
+        }
+      };
+      $('#urlForm').on('submit', app.send.bind(this, app.input));
+    });
+
+</script>
 </head>
 <body>
   Enter a URL here:
-  <form method="POST">
-    <input type="input" name="url"></input>
+  <form id="urlForm">
+    <input id="url" type="input" name="url"></input>
   </form>
 </body>
+
 </html>
+
