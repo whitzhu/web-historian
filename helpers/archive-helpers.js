@@ -26,6 +26,10 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, function(err, data) {
+    var lines = data.toString().split('\n');
+    callback(lines);
+  });  
 };
 
 exports.isUrlInList = function(url, callback) {
@@ -49,7 +53,23 @@ exports.addUrlToList = function(url, callback) {
 };
 
 exports.isUrlArchived = function(url, callback) {
+  fs.stat(exports.paths.archivedSites + '/' + url, function(err, stats) {
+    if (err) {
+      return callback(false);
+    } else {
+      callback(true); 
+    }
+  });
 };
 
 exports.downloadUrls = function(urls) {
+  for (var i = 0; i < urls.length; i++ ) {
+    fs.writeFile(exports.paths.archivedSites + '/' + urls[i], 'Hello World', function() {});
+  }
 };
+
+
+
+
+// var urlArray = ['www.example.com', 'www.google.com'];
+//       archive.downloadUrls(urlArray);

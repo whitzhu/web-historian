@@ -5,6 +5,7 @@ var archive = require('../helpers/archive-helpers');
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
+  var statusCode = 200;
   if ( req.method === 'POST') {
     var body = '';
     req.on('data', function(chunk) {
@@ -16,15 +17,30 @@ exports.handleRequest = function (req, res) {
       var result = archive.isUrlInList(url, function(result) {
         return result;
       });
-      if (result === false) {
-        archive.addUrlToList(url, callback);
-      }
+        //result is true & isURLArchived to false
+          //return loading html file
 
+      if (result === true && archive.isURLArchived(url, function(result) { return result; }) === false || result === false) {
+        if (result === false) {
+          archive.addUrlToList(url, callback);
+        }
+        res.writeHead(statusCode, {'Content-Type': 'text/html'});
+        fs.readFile(__dirname + '/public/loading.html', function(err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            res.end(data);      
+          }
+        });
+      } 
     });
+
   }
 
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  
+  if (req.method === 'GET') {
+    statusCode = 404;
+  }
+  res.writeHead(statusCode, {'Content-Type': 'text/html'});  
   fs.readFile(__dirname + '/public/index.html', function(err, data) {
     if (err) {
       console.log(err);
