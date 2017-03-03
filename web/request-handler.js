@@ -16,16 +16,20 @@ exports.handleRequest = function (req, res) {
       console.log("yay!!!! >_<");
       archive.addUrlToList(url, callback);
     }
-    if (result === true && archive.isURLArchived(url, function(result) { return result; }) === false) {  
+    if (result === true) {  
       console.log("nooooooooooo!!!! >_<");
-      res.writeHead(statusCode, {'Content-Type': 'text/html'});
-      fs.readFile(__dirname + '/public/loading.html', function(err, data) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('we are loading a loading page');
-          res.end(data);      
-        }
+      archive.isUrlArchived(url, function(result) {    
+        if (result === false) {
+          res.writeHead(statusCode, {'Content-Type': 'text/html'});
+          fs.readFile(__dirname + '/public/loading.html', function(err, data) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log('we are loading a loading page');
+              res.end(data);      
+            }
+          });
+        } 
       });
     }
   }; 
@@ -40,10 +44,7 @@ exports.handleRequest = function (req, res) {
       var url = JSON.parse(body);
       console.log("url!!!!!!!!!", url);
       archive.isUrlInList(url, function(exists) {
-        // if (exists === false) {
-
         func(exists, url, callback);
-        // } 
         return exists;
       });
         //result is true & isURLArchived to false

@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -26,14 +27,14 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
-  fs.readFile(exports.paths.list, function(err, data) {
+  fs.readFile(this.paths.list, function(err, data) {
     var lines = data.toString().split('\n');
     callback(lines);
   });  
 };
 
 exports.isUrlInList = function(url, callback) {
-  fs.readFile(exports.paths.list, function(err, data) {
+  fs.readFile(this.paths.list, function(err, data) {
     var result = false;
     var lines = data.toString().split('\n');
     for (var i = 0; i < lines.length; i++) {
@@ -46,14 +47,14 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.appendFile(exports.paths.list, url + '\n', function(err) {
+  fs.appendFile(this.paths.list, url + '\n', function(err) {
     console.log(err);
   });
   callback();
 };
 
 exports.isUrlArchived = function(url, callback) {
-  fs.stat(exports.paths.archivedSites + '/' + url, function(err, stats) {
+  fs.stat(this.paths.archivedSites + '/' + url, function(err, stats) {
     if (err) {
       return callback(false);
     } else {
@@ -63,9 +64,46 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urls) {
+  console.log(urls);
+  _.each(urls, function(url) {
+    http.get('http://' + url, (res) => {
+      var body = '';
+      console.log('check point 1');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      console.log('check point 2');
+      res.on('end', function() {
+        console.log(url);
+        fs.writeFile(exports.paths.archivedSites + '/' + url, body);
+      });
+    });
+
+  });
+
+  /*
   for (var i = 0; i < urls.length; i++ ) {
-    fs.writeFile(exports.paths.archivedSites + '/' + urls[i], 'Hello World', function() {});
+    console.log('===============================================================');
+    http.get('http://' + urls[i], (res) => {
+      var body = '';
+      console.log('check point 1');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      console.log('check point 2');
+      res.on('end', function() {
+        console.log(urls[i]);
+        fs.writeFile(exports.paths.archivedSites + '/' + urls[i], body, function(err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data);     
+          }
+        });
+      });
+    });
   }
+  */
 };
 
 
