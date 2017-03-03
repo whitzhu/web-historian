@@ -15,11 +15,7 @@
             data: JSON.stringify(message),
             contentType: 'application/json',
             success: function(data) {
-              console.log('sending data success!!', data);
-
-              //load HTML data into dom 
-              $('body').load(data);
-
+              console.log('sending data success!!');
             },
             error: function(data) {
               console.log('error', data);
@@ -29,8 +25,6 @@
       };
       $('#urlForm').on('submit', function(event) {
         var text = $('#url').val();
-        console.log('txt', text);
-        event.preventDefault();
         app.send(text);
       });
     });
@@ -38,7 +32,7 @@
 </head>
 <body id='body'>
   Enter a URL here:
-  <form id="urlForm">
+  <form id="urlForm" method="POST">
     <input id="url" type="input" name="url"></input>
     <input type="submit" value="Submit"></input>
   </form>

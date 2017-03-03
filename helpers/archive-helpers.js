@@ -47,10 +47,13 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.appendFile(this.paths.list, url + '\n', function(err) {
-    console.log(err);
+  fs.appendFile(this.paths.list, url + '\n', function(err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      callback(data);    
+    }
   });
-  callback();
 };
 
 exports.isUrlArchived = function(url, callback) {
@@ -64,50 +67,16 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urls) {
-  console.log(urls);
   _.each(urls, function(url) {
     http.get('http://' + url, (res) => {
       var body = '';
-      console.log('check point 1');
       res.on('data', function(chunk) {
         body += chunk;
       });
-      console.log('check point 2');
       res.on('end', function() {
-        console.log(url);
         fs.writeFile(exports.paths.archivedSites + '/' + url, body);
       });
     });
 
   });
-
-  /*
-  for (var i = 0; i < urls.length; i++ ) {
-    console.log('===============================================================');
-    http.get('http://' + urls[i], (res) => {
-      var body = '';
-      console.log('check point 1');
-      res.on('data', function(chunk) {
-        body += chunk;
-      });
-      console.log('check point 2');
-      res.on('end', function() {
-        console.log(urls[i]);
-        fs.writeFile(exports.paths.archivedSites + '/' + urls[i], body, function(err, data) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(data);     
-          }
-        });
-      });
-    });
-  }
-  */
 };
-
-
-
-
-// var urlArray = ['www.example.com', 'www.google.com'];
-//       archive.downloadUrls(urlArray);
